@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils.dateformat import DateFormat
 from django.http import JsonResponse, HttpResponse
+from django.contrib.auth.models import User
 
 from reportlab.pdfgen import canvas
 from rest_framework.decorators import api_view
@@ -94,3 +95,23 @@ def api_animals(request):
 def api_records(request):
     records = HealthRecord.objects.all()
     return Response(HealthRecordSerializer(records, many=True).data)
+
+
+
+def signup_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        email = request.POST['email']
+        password1 = request.POST['password1']
+        password2 = request.POST['password2']
+
+        if password1 != password2:
+            return render(request, 'signup.html', {'error': 'Passwords do not match'})
+        if User.objects.filter(username=username).exists():
+            return render(request, 'signup.html', {'error': 'Username already taken'})
+
+        user = User.objects.create_user(username=username, email=email, password=password1)
+        login(request, user)
+        return redirect('dashboard')
+
+    return render(request, 'signup.html')
