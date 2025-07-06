@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>🐄 Animal Health Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>🐄 Animal Health Monitoring</h1>
+            <div>
+                <a href="{% url 'logout' %}" class="btn btn-logout">🚪 Logout</a>
+                <a href="{% url 'export_pdf' %}" class="btn btn-export">📤 Export PDF</a>
+            </div>
+        </div>
+
+        <hr>
+
+        <h2>📋 Registered Animals</h2>
+        <ul>
+            {% for animal in animals %}
+                <li><strong>{{ animal.name }}</strong> ({{ animal.species }}, Tag: {{ animal.tag_number }})</li>
+            {% empty %}
+                <li>No animals registered.</li>
+            {% endfor %}
+        </ul>
+
+        <h2>🩺 Recent Health Records</h2>
+        <ul>
+            {% for record in records %}
+                <li><strong>{{ record.animal.name }}</strong>: {{ record.date_recorded }} | Temp: {{ record.temperature }}°C | Diagnosis: {{ record.diagnosis }}</li>
+            {% empty %}
+                <li>No recent health records.</li>
+            {% endfor %}
+        </ul>
+
+        <h2>💉 Vaccination Records</h2>
+        <ul>
+            {% for vac in vaccinations %}
+                <li><strong>{{ vac.animal.name }}</strong>: {{ vac.vaccine_name }} | Administered: {{ vac.date_administered }} | Next Due: {{ vac.next_due }}</li>
+            {% empty %}
+                <li>No vaccinations recorded.</li>
+            {% endfor %}
+        </ul>
+
+        <h2>📅 Upcoming Vet Visits</h2>
+        <ul>
+            {% for visit in upcoming_visits %}
+                <li><strong>{{ visit.animal.name }}</strong>: {{ visit.reason }} | Visit Date: {{ visit.visit_date }}</li>
+            {% empty %}
+                <li>No upcoming vet visits scheduled.</li>
+            {% endfor %}
+        </ul>
+
+        <h2>📈 Temperature Trends (Last 10 readings)</h2>
+        <canvas id="tempChart" width="400" height="200"></canvas>
+
+        <script>
+            const ctx = document.getElementById("tempChart").getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: {{ temp_labels|safe }},
+                    datasets: [{
+                        label: 'Temperature (°C)',
+                        data: {{ temp_data|safe }},
+                        borderColor: '#e67e22',
+                        tension: 0.4,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 35,
+                            max: 42
+                        }
+                    }
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>
