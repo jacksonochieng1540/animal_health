@@ -31,5 +31,5 @@ A beautifully themed web application built with **Django**, designed to help far
 ### 1. Clone the project
 
 ```bash
-git clone https://github.com/yourusername/animal-health-monitor.git
+git clone https://github.com/jacksonochieng1540/animal-health-monitor.git
 cd animal-health-monitor
